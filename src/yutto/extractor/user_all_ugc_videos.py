@@ -49,6 +49,10 @@ class UserAllUgcVideosExtractor(BatchExtractor):
                     continue
                 await Fetcher.touch_url(client, avid.to_url())
                 for ugc_video_item in ugc_video_list["pages"]:
+                    # if ugc_video_item["metadata"]["actor"] and ugc_video_item["metadata"]["actor"][0]["profile"].split("/")[-1] != self.mid:
+                    #     first_actor = ugc_video_item["metadata"]["actor"][0]["profile"].split("/")[-1]
+                    #     Logger.debug(f"因为首位作者为 {first_actor} 而不是 {self.mid}，跳过 {ugc_video_item['title']}")
+                    #     continue
                     ugc_video_info_list.append(
                         (
                             ugc_video_item,

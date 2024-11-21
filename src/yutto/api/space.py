@@ -8,6 +8,7 @@ from yutto.api.user_info import encode_wbi, get_wbi_img
 from yutto.exceptions import NotLoginError
 from yutto.utils.console.logger import Logger
 from yutto.utils.fetcher import Fetcher
+from yutto.utils.asynclib import async_cache
 
 if TYPE_CHECKING:
     from httpx import AsyncClient
@@ -41,6 +42,7 @@ async def get_user_space_all_videos_avids(client: AsyncClient, mid: MId) -> list
 
 
 # 个人空间·用户名
+@async_cache(lambda args: f"{args.arguments['mid']}")
 async def get_user_name(client: AsyncClient, mid: MId) -> str:
     wbi_img = await get_wbi_img(client)
     params = {"mid": mid}

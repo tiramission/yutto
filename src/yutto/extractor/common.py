@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Final
 
 from yutto._typing import AvId, EpisodeData, EpisodeId, format_ids
 from yutto.api.bangumi import (
@@ -10,6 +10,7 @@ from yutto.api.bangumi import (
 )
 from yutto.api.cheese import CheeseListItem, get_cheese_playurl, get_cheese_subtitles
 from yutto.api.danmaku import get_danmaku
+from yutto.api.space import get_user_name
 from yutto.api.ugc_video import (
     UgcVideoListItem,
     get_ugc_video_chapters,
@@ -38,6 +39,7 @@ if TYPE_CHECKING:
 
     import httpx
 
+MAX_NAME: Final[int] = 60
 
 async def extract_bangumi_data(
     client: httpx.AsyncClient,
@@ -71,6 +73,8 @@ async def extract_bangumi_data(
             "pubdate": UNKNOWN,
             "download_date": bangumi_info["metadata"]["dateadded"],
             "owner_uid": UNKNOWN,
+            "avid": avid,
+            "sname": name[:MAX_NAME],
         }
         subpath_variables_base.update(subpath_variables)
         subpath = resolve_path_template(args.subpath_template, auto_subpath_template, subpath_variables_base)
@@ -126,6 +130,8 @@ async def extract_cheese_data(
             "pubdate": UNKNOWN,
             "download_date": UNKNOWN,
             "owner_uid": UNKNOWN,
+            "avid": avid,
+            "sname": name[:MAX_NAME],
         }
         subpath_variables_base.update(subpath_variables)
         subpath = resolve_path_template(args.subpath_template, auto_subpath_template, subpath_variables_base)
@@ -179,6 +185,10 @@ async def extract_ugc_video_data(
             if ugc_video_info["metadata"]["actor"]
             else UNKNOWN
         )
+        owner_username: str = (
+            await get_user_name(client, owner_uid)
+            if owner_uid != UNKNOWN else UNKNOWN
+        )
         subpath_variables_base: PathTemplateVariableDict = {
             "id": id,
             "name": name,
@@ -188,6 +198,9 @@ async def extract_ugc_video_data(
             "pubdate": UNKNOWN,
             "download_date": ugc_video_info["metadata"]["dateadded"],
             "owner_uid": owner_uid,
+            "avid": avid,
+            "sname": name[:MAX_NAME],
+            "owner_username": owner_username,
         }
         subpath_variables_base.update(subpath_variables)
         subpath = resolve_path_template(args.subpath_template, auto_subpath_template, subpath_variables_base)
